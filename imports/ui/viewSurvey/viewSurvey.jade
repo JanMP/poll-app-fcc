@@ -1,0 +1,60 @@
+template(name="selectSurveyView")
+  if mayVote
+    +voteSurvey
+  else
+    +viewSurvey
+
+template(name="viewSurvey")
+  with survey
+    .ui.text.container.segment
+      h1.ui.header(style="margin-bottom : 0") #{title}
+      h3.ui.header(style="margin-top : 0") #{question}
+      +chart
+      table.ui.very.basic.unstackable.table
+        thead
+          tr
+            th #
+            th Answer
+            th.right.aligned Votes
+        tbody
+          each answers
+            +viewAnswer
+
+template(name="viewAnswer")
+  tr
+    td #{ordinal}
+    td #{text}
+    td.right.aligned #{amount}
+
+template(name="voteSurvey")
+  with survey
+    .ui.text.container.segment
+      h1.ui.header(style="margin-bottom : 0") #{title}
+      h3.ui.header(style="margin-top : 0") #{question}
+      +chart
+      table.ui.very.basic.unstackable.table
+        tbody
+          each answers
+            +voteAnswer
+          if allowAddAnswer
+            +voteAddedAnswer
+      button.ui.button(style="margin-top : 2em" $b="enable : voteButtonEnabled, click : vote") Vote
+
+template(name="voteAnswer")
+  tr
+    td 
+      input(type="radio" name="answer" $b="value : _id, group : parent.answerSelected")
+    td #{ordinal}
+    td #{text}
+    td #{amount}
+
+template(name="voteAddedAnswer")
+  tr
+    td 
+      input(type="radio" name="answer" $b="value : 'addedAnswer', group : parent.answerSelected")
+    td
+    td
+      .ui.fluid.transparent.input
+        input(type="text" placeholder="supply your own answer" $b="value: parent.addedAnswer")
+    td
+    

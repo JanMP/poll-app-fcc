@@ -1,0 +1,14 @@
+{
+  "name": "survey",
+  "private": true,
+  "scripts": {
+    "start": "meteor run"
+  },
+  "dependencies": {
+    "chartist": "^0.9.7",
+    "lodash": "^4.10.0",
+    "meteor-node-stubs": "~0.2.0",
+    "semantic-ui-css": "^2.1.8",
+    "semantic-ui-icon": "^2.1.7"
+  }
+}

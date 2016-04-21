@@ -1,0 +1,23 @@
+template(name="listSurveys")
+  .ui.container.segment
+    .ui.grid
+      .row
+        .left.floated.thirteen.wide.column
+          h1.ui.header Public Surveys:
+        .column
+          a($b="if:mayCreate" href="/edit-survey/new" title="create new survey")
+            button.ui.circular.right.floated.icon.button
+              i.plus.icon
+    .ui.relaxed.cleared.divided.selection.list
+      each surveys
+        +survey
+
+template(name="survey")
+  .item($b="click:vote")
+    i.large.black.right.floated.close.icon($b="if:mayEdit, click:delete")
+    .content
+      .header 
+        h3.ui.header #{title}
+      .description
+        h4.ui.header #{question}
+        p by <em>#{authorName}</em>

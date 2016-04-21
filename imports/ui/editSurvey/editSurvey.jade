@@ -1,0 +1,43 @@
+template(name="editSurvey")
+  if loggedIn
+    .ui.container.segment
+      h1.ui.header New Survey:
+      form.ui.form
+        with survey
+          +editSurveyForm
+      .ui.grid(style="margin-top:1.5em")
+        .row
+          .left.floated.thirteen.wide.column
+            h2.ui.header Answers:
+          .column
+            button.ui.right.floated.circular.icon.button($b="click:addQuestion")
+              i.plus.icon
+      form.ui.form
+        +sortable(items=answers options=sortableOptions)
+          +answerEdit
+        button.ui.button(style="margin-top:2em" $b="click:publish") Publish
+  else
+    +accessDeniedLogIn
+
+template(name="editSurveyForm")
+  .field
+    label Title:
+    input(type="text" placeholder="Flashy Title" $b="value: title, change:update, throttle:500")
+  .field
+    label Question:
+    input(type="text" placeholder="What is your favorite color?" $b="value:question, change:update, throttle:500")
+  .field
+    .ui.checkbox
+      input(type="checkbox" tabindex="0" $b="check:allowAddAnswer, change:update")
+      label Allow registered users to add their own answers
+
+template(name="answerEdit")
+  .ui.grid.segment.draggable(data-id=_id)
+    .row
+      .left.floated.column
+        i.bordered.move.icon.handle
+      .twelve.wide.column
+        .ui.fluid.transparent.input
+          input(type="text" placeholder="some answer" $b="value:text, change:update, throttle:500")
+      .right.floated.column
+        i.delete.icon($b="click:remove")

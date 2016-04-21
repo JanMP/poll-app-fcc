@@ -1,0 +1,13 @@
+template(name="navbar")
+  .ui.fixed.transparent.main.menu
+    .header.item Survey
+    a.item(class=isActiveRoute('info') href="/info")
+      i.large.info.icon
+    .right.menu
+      a.item(class=isActiveRoute('home') href="/")
+        i.large.list.icon
+      a.item(class=isActiveRoute('settings') href="/settings")
+        i.large.settings.icon
+      a.item(class=isActiveRoute('help') href="/help")
+        i.large.help.icon
+      +loginButtons
