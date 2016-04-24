@@ -3,6 +3,7 @@ template(name="selectSurveyView")
     +voteSurvey
   else
     +viewSurvey
+  
 
 template(name="viewSurvey")
   with survey
@@ -13,7 +14,7 @@ template(name="viewSurvey")
       table.ui.very.basic.unstackable.table
         thead
           tr
-            th #
+            th.one.wide #
             th Answer
             th.right.aligned Votes
         tbody
@@ -33,6 +34,12 @@ template(name="voteSurvey")
       h3.ui.header(style="margin-top : 0") #{question}
       +chart
       table.ui.very.basic.unstackable.table
+        thead
+          tr
+            th.one.wide
+            th.one.wide #
+            th Answer
+            th.one.wide.right.aligned Votes
         tbody
           each answers
             +voteAnswer
@@ -46,7 +53,7 @@ template(name="voteAnswer")
       input(type="radio" name="answer" $b="value : _id, group : parent.answerSelected")
     td #{ordinal}
     td #{text}
-    td #{amount}
+    td.right.aligned #{amount}
 
 template(name="voteAddedAnswer")
   tr

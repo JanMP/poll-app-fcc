@@ -15,62 +15,74 @@ if Meteor.isClient
   
   Template.sortable.onCreated ->
 
-    this.options = this.data.options ? {}
-    for key, value of this.data
+    @options = @data.options ? {}
+    for key, value of @data
       unless key is "options" or key is "items"
-        this.options[key] = value
-        delete this.data[key]
-    this.options.sortField = this.options.sortField ? "order"
-    if this.data.items and this.data.items.collection
-      this.collectionName = this.data.items.collection.name
-      this.collection = Mongo.Collection.get this.collectionName
+        @options[key] = value
+        delete @data[key]
+    @options.sortField = @options.sortField ? "order"
+    if @data.items and @data.items.collection
+      @collectionName = @data.items.collection.name
+      @collection = @data.items.collection
+      #this didn't work with local collections:
+      #@collection = Mongo.Collection.get @collectionName
+    else if @data.items
+      # collection passed via items=; does NOT have a .name property, but _name
+      @collection = @data.items
+      @collectionName = @collection._name
+    else if @data.collection
+      # cursor passed directly
+      @collectionName = @data.collection.name
+      @collection = Mongo.Collection.get @collectionName
     else
-      console.log "pass Cursor via items= and make sure it has a .name property"
-    delete this.data.options
+      # collection passed directly
+      @collection = @data
+      @collectionName = @collection._name
+    delete @data.options
 
 
   Template.sortable.onRendered ->
 
     orderObj = (i) =>
       obj = {}
-      obj[this.options.sortField] = i
+      obj[@options.sortField] = i
       obj
 
     reorder = =>
-      if this.options.sort
-        orderArray = this.sortable.toArray()
+      if @options.sort
+        orderArray = @sortable.toArray()
         for id, i in orderArray
-          this.collection.update id,
+          @collection.update id,
             $set : orderObj i
 
-    optionsOnUpdate = this.options.onUpdate
-    this.options.onUpdate = (event) =>
+    optionsOnUpdate = @options.onUpdate
+    @options.onUpdate = (event) =>
       setEventData event
       if optionsOnUpdate then optionsOnUpdate event, this
       unless event.doNotReorder
         reorder()
 
-    optionsOnAdd = this.options.onAdd
-    this.options.onAdd = (event) =>
+    optionsOnAdd = @options.onAdd
+    @options.onAdd = (event) =>
       setEventData event
       if optionsOnAdd then optionsOnAdd event, this
       unless event.doNotReorder
         reorder()
 
-    optionsOnRemove = this.options.onRemove
-    this.options.onRemove = (event) =>
+    optionsOnRemove = @options.onRemove
+    @options.onRemove = (event) =>
       setEventData event
       if optionsOnRemove then optionsOnRemove event, this
       unless event.doNotReorder
         reorder()
 
     for eventHandler in ["onStart", "onEnd", "onSort", "onFilter"]
-      if this.options[eventHandler]
-        userEventHandler = this.options[eventHandler]
-        this.options[eventHandler] = (event) =>
+      if @options[eventHandler]
+        userEventHandler = @options[eventHandler]
+        @options[eventHandler] = (event) =>
           setEventData event
           userEventHandler event, this
 
-    this.sortable = Sortable.create this.find(".sortable-dropzone"),
+    @sortable = Sortable.create @find(".sortable-dropzone"),
       this.options
       

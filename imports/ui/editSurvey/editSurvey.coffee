@@ -1,45 +1,41 @@
 require "/imports/ui/editSurvey/editSurvey.jade"
-{ Surveys, Answers } = require "/imports/api/surveys.coffee"
+{ Surveys, Answers } = require "/imports/api/collections.coffee"
 require "/node_modules/semantic-ui-css/semantic.min.js"
 require "/imports/sortable/sortable-meteor.coffee"
 
+{ Mongo } = require "meteor/mongo"
+
+AnswersLocal = new Mongo.Collection null
+
 Template.editSurvey.viewmodel
-  id : -> FlowRouter.getParam "id"
-  survey : ->
-    Surveys.findOne @id()
+
+  #input fields:
+  title : ""
+  question : ""
+  allowAddAnswer : false
   answers : ->
-    Answers.find
-      surveyId : @id()
-    ,
+    AnswersLocal.find {},
       sort :
         order : 1
-  autorun : ->
-    if @id() is "new"
-      editSurvey = Surveys.findOne
-        authorId : Meteor.userId()
-        editing : true
-      if editSurvey?
-        FlowRouter.go "/edit-survey/#{editSurvey._id}"
-      else
-        Surveys.insert Surveys.freshSurvey(), (err, id) ->
-          unless err?
-            FlowRouter.go "/edit-survey/#{id}"
-          else
-            console.log err
-  loggedIn : -> !!Meteor.user()
-  
+
+  #buttons:
   addQuestion : (event) ->
     event.preventDefault()
     order = @answers().count()
-    Answers.insert Answers.freshAnswer(@id(), order)
-    
+    AnswersLocal.insert Answers.freshAnswer("", order)
+
   publish : (event) ->
-    event.preventDefault()
-    console.log @survey()
-    Surveys.update @id(),
-      $set:
-        editing : false
+    event.preventDefault
+    Meteor.call "survey.insertSurvey",
+      survey :
+        title : @title()
+        question : @question()
+        allowAddAnswer : @allowAddAnswer()
+      answers : AnswersLocal.find({}).fetch()
     FlowRouter.go "/"
+
+  #misc helpers
+  loggedIn : -> !!Meteor.user()
 
   sortableOptions : ->
     sort : true
@@ -47,23 +43,14 @@ Template.editSurvey.viewmodel
     draggable : ".draggable"
     handle : ".handle"
 
-Template.editSurveyForm.viewmodel
-  onRendered : -> @checkbox.checkbox()
-
-  update : ->
-    Surveys.update @_id(),
-      $set :
-        title : @title()
-        question : @question()
-        allowAddAnswer: @allowAddAnswer()
+  #onRendered : -> @checkbox.checkbox()
 
 Template.answerEdit.viewmodel
+  text : ""
   update : ->
-    console.log "update answer", @_id()
-    Answers.update @_id(),
+    AnswersLocal.update @_id(),
       $set :
         text : @text()
 
   remove : ->
-    console.log "remove answer", @_id()
-    Answers.remove @_id()
+    AnswersLocal.remove @_id()

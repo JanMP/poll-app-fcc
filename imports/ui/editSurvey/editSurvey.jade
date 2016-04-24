@@ -1,10 +1,20 @@
 template(name="editSurvey")
-  if loggedIn
+  unless loggedIn
+    +accessDeniedLogIn
+  else
     .ui.container.segment
       h1.ui.header New Survey:
       form.ui.form
-        with survey
-          +editSurveyForm
+        .field
+          label Title:
+          input(type="text" placeholder="Flashy Title" $b="value: title, change:update, throttle:500")
+        .field
+          label Question:
+          input(type="text" placeholder="What is your favorite color?" $b="value:question, change:update, throttle:500")
+        .field
+          .ui.checkbox
+            input(type="checkbox" tabindex="0" $b="check:allowAddAnswer, change:update")
+            label Allow registered users to add their own answers
       .ui.grid(style="margin-top:1.5em")
         .row
           .left.floated.thirteen.wide.column
@@ -12,32 +22,16 @@ template(name="editSurvey")
           .column
             button.ui.right.floated.circular.icon.button($b="click:addQuestion")
               i.plus.icon
-      form.ui.form
-        +sortable(items=answers options=sortableOptions)
+      .ui.segments
+        +sortable(items=answers() options=sortableOptions)
           +answerEdit
-        button.ui.button(style="margin-top:2em" $b="click:publish") Publish
-  else
-    +accessDeniedLogIn
-
-template(name="editSurveyForm")
-  .field
-    label Title:
-    input(type="text" placeholder="Flashy Title" $b="value: title, change:update, throttle:500")
-  .field
-    label Question:
-    input(type="text" placeholder="What is your favorite color?" $b="value:question, change:update, throttle:500")
-  .field
-    .ui.checkbox
-      input(type="checkbox" tabindex="0" $b="check:allowAddAnswer, change:update")
-      label Allow registered users to add their own answers
-
+      button.ui.button(style="margin-top:2em" $b="click:publish") Publish
+    
 template(name="answerEdit")
-  .ui.grid.segment.draggable(data-id=_id)
-    .row
-      .left.floated.column
-        i.bordered.move.icon.handle
-      .twelve.wide.column
-        .ui.fluid.transparent.input
-          input(type="text" placeholder="some answer" $b="value:text, change:update, throttle:500")
-      .right.floated.column
-        i.delete.icon($b="click:remove")
+  .ui.clearing.attached.container.segment.draggable(data-id=_id)
+    button.ui.basic.left.floated.icon.button.handle
+      i.resize.vertical.icon
+    button.ui.basic.right.floated.icon.button
+      i.delete.icon($b="click:remove")
+    .ui.fluid.input
+      input(type="text" placeholder="enter an answer" $b="value:text, change:update")

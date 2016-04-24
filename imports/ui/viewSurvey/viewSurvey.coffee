@@ -1,75 +1,56 @@
 require "/imports/ui/viewSurvey/viewSurvey.jade"
-{ Surveys, Answers } = require "/imports/api/surveys.coffee"
-{ Voted } = require "/imports/api/voted.coffee"
+{ Surveys, Answers, Voted} = require "/imports/api/collections.coffee"
 require "/node_modules/semantic-ui-css/semantic.min.js"
 
+#TODO: Only show Graph if there have been votes +cosmetic
+
+ViewModel.share
+  surveyData :
+    surveyId : -> FlowRouter.getParam "id"
+    survey : -> Surveys.findOne @surveyId
+    answers : -> @survey().answers()
+
 Template.selectSurveyView.viewmodel
+  share : "surveyData"
   mayVote : ->
     unless Meteor.user()?
       false
     else
       voted = Voted.findOne
         userId : Meteor.userId()
-        surveyId : FlowRouter.getParam "id"
+        surveyId : @surveyId()
       not voted?
   autorun : ->
-    surveyId = FlowRouter.getParam "id"
-    ti = @templateInstance
-    console.log "subscribe Survey", surveyId
-    ti.subscribe "Survey", surveyId
-    ti.subscribe "Voted.onSurvey", Meteor.userId(), surveyId
-    ti.subscribe "Answers.forSurvey", surveyId
+    @templateInstance.subscribe "Survey", @surveyId()
 
 Template.viewSurvey.viewmodel
-  id : -> FlowRouter.getParam "id"
-  survey : ->
-    Surveys.findOne @id()
-  answers : ->
-    Answers.find
-      surveyId : @id()
-    ,
-      sort :
-        order : 1
+  share : "surveyData"
 
 Template.viewAnswer.viewmodel
   ordinal : -> @order() + 1
 
 Template.voteSurvey.viewmodel
-  id : -> FlowRouter.getParam "id"
+  share : "surveyData"
   answerSelected : ""
   addedAnswer : ""
-  survey : ->
-    Surveys.findOne @id()
-  answers : ->
-    Answers.find
-      surveyId : @id()
-    ,
-      sort :
-        order : 1
   loggedIn : -> !!Meteor.user()
   voteButtonEnabled : ->
     @answerSelected() isnt "" and
     (@answerSelected() isnt "addedAnswer" or @addedAnswer() isnt "")
   vote : ->
-    setVoted = =>
-      Meteor.users.update Meteor.userId(),
-        $addToSet :
-          votedOn : @id()
-    if @loggedIn()
-      unless @answerSelected() is ""
-        unless @answerSelected() is "addedAnswer"
-          Answers.update @answerSelected(),
-            $inc :
-              amount : 1
-          setVoted()
-        else
-          order = Answers.find({surveyId : @id()}).count()
-          Answers.insert
-            surveyId : @id()
-            text : @addedAnswer()
-            amount : 1
-            order : order
-          setVoted()
+    unless @answerSelected() is "addedAnswer"
+      Meteor.call "survey.vote",
+        answerId : @answerSelected()
+    else
+      order = @answers().count()
+      newAnswerId = Answers.insert
+        surveyId : @surveyId()
+        text : @addedAnswer()
+        amount : 0
+        order : @answers().count()
+      Meteor.call "survey.vote",
+        answerId : newAnswerId
+
 
 Template.voteAnswer.viewmodel
   selected : -> false

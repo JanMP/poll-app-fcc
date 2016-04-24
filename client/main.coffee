@@ -7,6 +7,7 @@ require "/imports/ui/help/help.jade"
 require "/imports/ui/info/info.jade"
 require "/imports/ui/settings/settings.jade"
 
+require "/imports/api/methods.coffee"
 require "/imports/ui/router.coffee"
 require "/imports/ui/listSurveys/listSurveys.coffee"
 require "/imports/ui/editSurvey/editSurvey.coffee"

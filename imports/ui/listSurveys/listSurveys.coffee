@@ -1,10 +1,9 @@
 require "/imports/ui/listSurveys/listSurveys.jade"
-{ Surveys, Answers } = require "/imports/api/surveys.coffee"
+{ Surveys, Answers } = require "/imports/api/collections.coffee"
 
 Template.listSurveys.viewmodel
   surveys : ->
-    Surveys.find
-      editing : false
+    Surveys.find {}
   mayCreate : -> Meteor.user()?
   onCreated : ->
     @templateInstance.subscribe "Surveys.public"
