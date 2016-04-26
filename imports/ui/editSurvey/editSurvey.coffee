@@ -13,6 +13,7 @@ Template.editSurvey.viewmodel
   title : ""
   question : ""
   allowAddAnswer : false
+  allowUnauthorized : false
   answers : ->
     AnswersLocal.find {},
       sort :
@@ -31,8 +32,13 @@ Template.editSurvey.viewmodel
         title : @title()
         question : @question()
         allowAddAnswer : @allowAddAnswer()
+        allowUnauthorized : @allowUnauthorized()
       answers : AnswersLocal.find({}).fetch()
-    FlowRouter.go "/"
+    ,
+      (err, res) ->
+        if err then throw err
+        AnswersLocal.remove {}
+        FlowRouter.go "/"
 
   #misc helpers
   loggedIn : -> !!Meteor.user()

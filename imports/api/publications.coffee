@@ -8,6 +8,7 @@ Meteor.publish "Survey", (surveyId) ->[
   Answers.find
     surveyId : surveyId
   Voted.find
-    userId : @userId
+    userId :
+      $in : [ @userId, @connection.clientAddress ]
     surveyId : surveyId
   ]

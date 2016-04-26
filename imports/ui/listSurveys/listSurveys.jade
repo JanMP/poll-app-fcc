@@ -1,5 +1,5 @@
 template(name="listSurveys")
-  .ui.container.segment
+  .ui.container.segment($b="class: {loading : loading}")
     .ui.grid
       .row
         .left.floated.thirteen.wide.column
@@ -14,7 +14,8 @@ template(name="listSurveys")
 
 template(name="survey")
   .item($b="click:vote")
-    i.large.black.right.floated.close.icon($b="if:mayEdit, click:delete")
+    button.ui.basic.circular.right.floated.icon.button($b="if:mayEdit, click:delete")
+      i.remove.icon
     .content
       .header 
         h3.ui.header #{title}

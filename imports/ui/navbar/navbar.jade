@@ -6,8 +6,10 @@ template(name="navbar")
     .right.menu
       a.item(class=isActiveRoute('home') href="/")
         i.large.list.icon
-      a.item(class=isActiveRoute('settings') href="/settings")
-        i.large.settings.icon
+      if currentUser
+        a.item(class=isActiveRoute('settings') href="/settings")
+          i.large.settings.icon
+      .item
+        +loginButtons(allign="right")
       a.item(class=isActiveRoute('help') href="/help")
         i.large.help.icon
-      +loginButtons

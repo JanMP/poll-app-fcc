@@ -1,9 +1,6 @@
-require "/imports/sortable/template.jade"
+require "./template.jade"
 
-if Meteor.isServer
-  Sortable = {}
-  Sortable.collections = []
-
+#TODO:40 Make Sortable secure +someday
 
 if Meteor.isClient
 
@@ -12,7 +9,6 @@ if Meteor.isClient
   setEventData = (event) ->
     event.data = Blaze.getData event.item
 
-  
   Template.sortable.onCreated ->
 
     @options = @data.options ? {}
@@ -85,4 +81,3 @@ if Meteor.isClient
 
     @sortable = Sortable.create @find(".sortable-dropzone"),
       this.options
-      

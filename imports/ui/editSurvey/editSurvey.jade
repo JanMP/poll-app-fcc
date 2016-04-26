@@ -7,14 +7,18 @@ template(name="editSurvey")
       form.ui.form
         .field
           label Title:
-          input(type="text" placeholder="Flashy Title" $b="value: title, change:update, throttle:500")
+          input(type="text" placeholder="enter a flashy title" $b="value: title")
         .field
           label Question:
-          input(type="text" placeholder="What is your favorite color?" $b="value:question, change:update, throttle:500")
+          input(type="text" placeholder="enter the question you want to ask" $b="value:question")
         .field
           .ui.checkbox
-            input(type="checkbox" tabindex="0" $b="check:allowAddAnswer, change:update")
+            input(type="checkbox" $b="check:allowAddAnswer")
             label Allow registered users to add their own answers
+        .field
+          .ui.checkbox
+            input(type="checkbox" $b="check:allowUnauthorized")
+            label Allow unregistered users to vote (check IP instead of UserId)
       .ui.grid(style="margin-top:1.5em")
         .row
           .left.floated.thirteen.wide.column

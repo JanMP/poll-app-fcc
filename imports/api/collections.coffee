@@ -16,6 +16,9 @@ Surveys.schema = new SimpleSchema
   allowAddAnswer :
     type : Boolean
     optional : true
+  allowUnauthorized :
+    type : Boolean
+    optional : true
 
 Surveys.schemaLight = new SimpleSchema
   title :
@@ -23,6 +26,9 @@ Surveys.schemaLight = new SimpleSchema
   question :
     type : String
   allowAddAnswer :
+    type : Boolean
+    optional : true
+  allowUnauthorized :
     type : Boolean
     optional : true
 

@@ -7,10 +7,11 @@ template(name="selectSurveyView")
 
 template(name="viewSurvey")
   with survey
-    .ui.text.container.segment
+    .ui.text.container.segment($b="class : {loading : parent.loading}")
       h1.ui.header(style="margin-bottom : 0") #{title}
       h3.ui.header(style="margin-top : 0") #{question}
-      +chart
+      if voted
+        +chart
       table.ui.very.basic.unstackable.table
         thead
           tr
@@ -29,10 +30,11 @@ template(name="viewAnswer")
 
 template(name="voteSurvey")
   with survey
-    .ui.text.container.segment
+    .ui.text.container.segment($b="class : {loading : parent.loading}")
       h1.ui.header(style="margin-bottom : 0") #{title}
       h3.ui.header(style="margin-top : 0") #{question}
-      +chart
+      if voted
+        +chart
       table.ui.very.basic.unstackable.table
         thead
           tr
@@ -44,7 +46,8 @@ template(name="voteSurvey")
           each answers
             +voteAnswer
           if allowAddAnswer
-            +voteAddedAnswer
+            if loggedIn
+              +voteAddedAnswer
       button.ui.button(style="margin-top : 2em" $b="enable : voteButtonEnabled, click : vote") Vote
 
 template(name="voteAnswer")

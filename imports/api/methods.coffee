@@ -25,8 +25,8 @@ exports.insertSurvey = new ValidatedMethod
   run : ({survey, answers}) ->
     unless @userId?
       throw new Meteor.Error "survey.insertSurvey unauthorized",
-      "user must be logged in"
-    survey.authorName = Meteor.user()?.emails[0]?.address
+      "user must be logged in to publish a survey"
+    survey.authorName = Meteor.user()?.profile?.name
     survey.authorId = Meteor.userId()
     Surveys.insert survey, (err, surveyId) ->
       if err then throw err
@@ -36,6 +36,34 @@ exports.insertSurvey = new ValidatedMethod
         answer.amount = 0
         Answers.insert answer, (err, result) ->
           if err then throw err
+
+exports.addAnswer = new ValidatedMethod
+  name : "survey.addAnswer"
+  validate : new SimpleSchema
+    surveyId :
+      type : String
+    text :
+      type : String
+  .validator()
+  run : ({surveyId, text}) ->
+    #Done:20 implement Method addAnswer
+    unless @userId?
+      throw new Meteor.Error "survey.addAnswer unauthorized",
+      "user must be logged in to add answers to survey"
+    survey = Surveys.findOne surveyId
+    answersCount = Answers.find(surveyId : surveyId).count()
+    Answers.insert
+      surveyId : surveyId
+      text : text
+      amount : 0
+      order : answersCount
+    ,
+    (err, newAnswerId) ->
+      if err
+        throw err
+      else
+        Meteor.call "survey.vote",
+          answerId : newAnswerId
 
 exports.vote = new ValidatedMethod
   name : "survey.vote"
@@ -47,20 +75,38 @@ exports.vote = new ValidatedMethod
     if answerId is ""
       throw new Meteor.Error "survey.vote missing answerId",
       "user must select an answer to vote"
-    unless @userId?
-      throw new Meteor.Error "survey.vote unauthorized",
-      "user must be logged in to vote"
     answer = Answers.findOne answerId
     surveyId = answer.surveyId
     survey = Surveys.findOne surveyId
-    votedObj =
-      userId : @userId
-      surveyId : answer.surveyId
-    voted = Voted.findOne votedObj
-    if voted?
-      throw new Meteor.Error "survey.vote already voted",
-      "user may only vote once on each survey"
-    Answers.update answerId,
-      $inc :
-        amount : 1
-    Voted.insert votedObj
+
+    mayVote = =>
+      if survey?.allowUnauthorized
+        voted = Voted.findOne
+          surveyId : surveyId
+          userId : @connection?.clientAddress
+        not voted?
+      else
+        unless @userId
+          false
+        else
+          voted = Voted.findOne
+            surveyId : surveyId
+            userId : @userId
+          not voted?
+
+    unless mayVote()
+      throw new Meteor.Error "survey.vote unauthorized",
+      "may not vote on this survey"
+    else
+      Answers.update answerId,
+        $inc :
+          amount : 1
+      Voted.insert
+        surveyId : surveyId
+        userId : if survey.allowUnauthorized
+          @connection?.clientAddress or "theServerKnows"
+        else
+          @userId
+
+Meteor.methods
+  getClientAddress : -> @connection?.clientAddress

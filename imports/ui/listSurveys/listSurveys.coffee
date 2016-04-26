@@ -5,8 +5,11 @@ Template.listSurveys.viewmodel
   surveys : ->
     Surveys.find {}
   mayCreate : -> Meteor.user()?
-  onCreated : ->
+  #Done:30 Display Loader
+  loading : -> not @templateInstance.subscriptionsReady()
+  autorun : ->
     @templateInstance.subscribe "Surveys.public"
+
 
 Template.survey.viewmodel
   mayEdit : -> Meteor.user()? and Meteor.userId() is @authorId()
@@ -16,4 +19,4 @@ Template.survey.viewmodel
     Meteor.call "survey.removeSurvey",
       id : @_id()
     , (err, res) ->
-      if err? then alert err
+      if err? then throw err
