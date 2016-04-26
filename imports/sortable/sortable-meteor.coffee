@@ -4,7 +4,7 @@ require "./template.jade"
 
 if Meteor.isClient
 
-  Sortable = require "/imports/sortable/Sortable.js"
+  Sortable = require "/node_modules/sortablejs/Sortable.js"
 
   setEventData = (event) ->
     event.data = Blaze.getData event.item
