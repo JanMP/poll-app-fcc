@@ -3,6 +3,11 @@ a challenge for freeCodeCamp
 
 [![Floobits Status](https://floobits.com/JanMP/survey-fcc.svg)](https://floobits.com/JanMP/survey-fcc/redirect)
 
+
+## Check it out on heroku:
+
+https://vote-app-fcc-janmp.herokuapp.com
+
 ## Tools used:
 
 * Libs:
